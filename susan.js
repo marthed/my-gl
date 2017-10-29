@@ -96,16 +96,16 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
 
   //---------------------------
   // Verticies setup
-
   var susanVerticies = susanModel.meshes[0].vertices; 
   //----------------------------
   // Indicies setup (create triangles)
-
   var susanIndicies = [].concat.apply([], susanModel.meshes[0].faces);
-
   //-----------------------
-
+  // Texture coordinates setup
   var susanTexCoords = susanModel.meshes[0].texturecoords[0];
+  //---------------------
+  // Normals setup
+  var susanNormals = susanModel.meshes[0].normals;
 
  
   // Buffers setup
@@ -121,8 +121,14 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, susanIndexBufferObject);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(susanIndicies), gl.STATIC_DRAW);
 
+  var susanNormalBufferObject = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, susanNormalBufferObject);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(susanNormals), gl.STATIC_DRAW)
+
   //---------------------
   // Attributes setup
+  
+  // Position attributes
   gl.bindBuffer(gl.ARRAY_BUFFER, susanPosVertexBufferObject);
   var positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
   gl.vertexAttribPointer(
@@ -135,6 +141,7 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
   );
   gl.enableVertexAttribArray(positionAttribLocation);
   
+  // Texture attributes
   gl.bindBuffer(gl.ARRAY_BUFFER, susanTexCoordsVertexBufferObject);  
   var texCoordAttribLocation = gl.getAttribLocation(program, 'vertTexCoord');  
   gl.vertexAttribPointer(
@@ -146,6 +153,19 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
     0 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
   );
   gl.enableVertexAttribArray(texCoordAttribLocation);
+
+  // Normal attributes
+  gl.bindBuffer(gl.ARRAY_BUFFER, susanNormalBufferObject);  
+  var normalAttribLocation = gl.getAttribLocation(program, 'vertNormal');  
+  gl.vertexAttribPointer(
+    normalAttribLocation,// Attribute Location
+    3,// Number of elements in each attribute
+    gl.FLOAT, // Type of elements
+    gl.TRUE, // Normalized
+    3 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+    0 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
+  );
+  gl.enableVertexAttribArray(normalAttribLocation);
 
   //------------------------------
   // Create texture
@@ -182,8 +202,11 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
   gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
   gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
 
-  //-----------------
-  // Variables for rendering
+  console.log("aasasd!");
+  
+
+  //------------------------
+  // Rotation variables
   var xRotationMatrix = new Float32Array(16);
   var yRotationMatrix = new Float32Array(16);
   var zRotationMatrix = new Float32Array(16);
@@ -191,7 +214,6 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
 
 
   var degreeToRadian = function(degree) {
-    console.log('floatToRadian');
     return degree * (Math.PI/180)
   }
 
@@ -201,8 +223,22 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
   mat4.rotate(zRotationMatrix, identityMatrix, degreeToRadian(180), [0, 0, 1]);
   
   var angle = 0; 
+  console.log("Hedfsdfj!");
+  
 
-  //mat4.mul(worldMatrix, xRotationMatrix, zRotationMatrix);
+  //--------------------
+  // Setup graphics pipeline lighting variables
+  gl.useProgram(program);
+  console.log("Hej!");
+  var ambientUniformLocation = gl.getUniformLocation(program, 'ambientLightIntensity');
+  var sunlightDirUniformLocation = gl.getUniformLocation(program, 'sunlightDirection');
+  var sunlightIntensityUniformLocation = gl.getUniformLocation(program, 'sunlightIntensity');
+
+  gl.uniform3f(ambientUniformLocation, 1.0, 1.0, 1.0);
+  gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
+  gl.uniform3f(sunlightIntensityUniformLocation, 0.9, 0.9, 0.9);
+  
+
   
   //------------------
   // Main render loop
