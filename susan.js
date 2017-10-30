@@ -234,12 +234,11 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
   var sunlightDirUniformLocation = gl.getUniformLocation(program, 'sunlightDirection');
   var sunlightIntensityUniformLocation = gl.getUniformLocation(program, 'sunlightIntensity');
 
-  gl.uniform3f(ambientUniformLocation, 1.0, 1.0, 1.0);
+  gl.uniform3f(ambientUniformLocation, 0.2, 0.2, 0.2);
   gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
   gl.uniform3f(sunlightIntensityUniformLocation, 0.9, 0.9, 0.9);
   
 
-  
   //------------------
   // Main render loop
   
