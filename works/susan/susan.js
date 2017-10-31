@@ -2,22 +2,22 @@ var gl;
 var model;
 
 var initDemo = function () {
-  loadTextResource('/shader.vs.glsl', function(vsErr, vsText) {
+  loadTextResource('/works/susan/shaders/shader.vs.glsl', function(vsErr, vsText) {
     if (vsErr) {
       alert('Fatal error with vertex shader');
       console.error(vsError);
     } else {
-      loadTextResource('/shader.fs.glsl', function (fsErr, fsText) {
+      loadTextResource('/works/susan/shaders/shader.fs.glsl', function (fsErr, fsText) {
         if (fsErr) {
           alert('Fatal error with fragment shader');
           console.error(fsErr);
         } else {
-            loadJSONResource('/Susan.json', function(modelErr, modelObject) {
+            loadJSONResource('/works/susan/Susan.json', function(modelErr, modelObject) {
               if (modelErr){
                 alert('Fatal error getting model');
                 console.error(modelErr);
               } else {
-                loadImage('/SusanTexture.png', function(imgErr, img){
+                loadImage('/works/susan/SusanTexture.png', function(imgErr, img){
                   if (imgErr) {
                     alert('Fatal error getting Susan model');
                     console.error(imgErr);
