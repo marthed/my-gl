@@ -201,10 +201,7 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix); // Second argument: transpose matrix
   gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
   gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
-
-  console.log("aasasd!");
   
-
   //------------------------
   // Rotation variables
   var xRotationMatrix = new Float32Array(16);
@@ -223,16 +220,13 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
   mat4.rotate(zRotationMatrix, identityMatrix, degreeToRadian(180), [0, 0, 1]);
   
   var angle = 0; 
-  console.log("Hedfsdfj!");
-  
 
   //--------------------
   // Setup graphics pipeline lighting variables
   gl.useProgram(program);
-  console.log("Hej!");
   var ambientUniformLocation = gl.getUniformLocation(program, 'ambientLightIntensity');
-  var sunlightDirUniformLocation = gl.getUniformLocation(program, 'sunlightDirection');
-  var sunlightIntensityUniformLocation = gl.getUniformLocation(program, 'sunlightIntensity');
+  var sunlightDirUniformLocation = gl.getUniformLocation(program, 'sun.direction');
+  var sunlightIntensityUniformLocation = gl.getUniformLocation(program, 'sun.color');
 
   gl.uniform3f(ambientUniformLocation, 0.2, 0.2, 0.2);
   gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
