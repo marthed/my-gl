@@ -1,46 +1,59 @@
 import styles from './styles.css';
-import { loadTextResource, loadImage, loadJSONResource } from './utils/loadingUtils';
+import { getTextResource, getImage, getJSONResource } from './utils/loadingUtils';
 import { setUpShaders } from './utils/shaderUtils';
 import { glMatrix, mat4 } from './utils/gl-matrix';
 
-var gl;
-var model;
+const initDemo = async () => {
+  try {
+    const vertexShaderText = await getTextResource('../shaders/shader.vs.glsl');
+    const fragmentShaderText = await getTextResource('../shaders/shader.fs.glsl');
+    const model = await getJSONResource('../models/Susan.json');
+    const texture = await getImage('../textures/SusanTexture.png');
+    console.log('texture: ', texture);
+    runDemo(vertexShaderText, fragmentShaderText, texture, model);
+  }
+  catch (error) {
+    console.log('Error: ', error);
+  }
 
-var initDemo = function () {
-  loadTextResource('../shaders/shader.vs.glsl', function(vsErr, vsText) {
-    if (vsErr) {
-      alert('Fatal error with vertex shader');
-      console.error(vsError);
-    } else {
-      loadTextResource('../shaders/shader.fs.glsl', function (fsErr, fsText) {
-        if (fsErr) {
-          alert('Fatal error with fragment shader');
-          console.error(fsErr);
-        } else {
-            loadJSONResource('../models/Susan.json', function(modelErr, modelObject) {
-              if (modelErr){
-                alert('Fatal error getting model');
-                console.error(modelErr);
-              } else {
-                loadImage('../textures/SusanTexture.png', function(imgErr, img){
-                  if (imgErr) {
-                    alert('Fatal error getting Susan model');
-                    console.error(imgErr);
-                  } else {
-                    runDemo(vsText, fsText, img, modelObject);                    
-                  }
-                });
-              }
-          });
-        }
-      });
-    }
-  })
-};
+}
 
-var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanModel) {
+// var initDemo = function () {
+//   loadTextResource('../shaders/shader.vs.glsl', function(vsErr, vsText) {
+//     if (vsErr) {
+//       alert('Fatal error with vertex shader');
+//       console.error(vsError);
+//     } else {
+//       loadTextResource('../shaders/shader.fs.glsl', function (fsErr, fsText) {
+//         if (fsErr) {
+//           alert('Fatal error with fragment shader');
+//           console.error(fsErr);
+//         } else {
+//             loadJSONResource('../models/Susan.json', function(modelErr, modelObject) {
+//               if (modelErr){
+//                 alert('Fatal error getting model');
+//                 console.error(modelErr);
+//               } else {
+//                 loadImage('../textures/SusanTexture.png', function(imgErr, img){
+//                   if (imgErr) {
+//                     alert('Fatal error getting Susan model');
+//                     console.error(imgErr);
+//                   } else {
+//                     runDemo(vsText, fsText, img, modelObject);                    
+//                   }
+//                 });
+//               }
+//           });
+//         }
+//       });
+//     }
+//   })
+// };
+
+var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, model) {
   console.log('This is working');
-  model = susanModel;
+  
+  console.log('susanImage: ', susanImage);
 
   var canvas = document.getElementById('glCanvas');
   var gl = canvas.getContext('webgl');
@@ -101,16 +114,16 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, susanM
 
   //---------------------------
   // Verticies setup
-  var susanVerticies = susanModel.meshes[0].vertices; 
+  var susanVerticies = model.meshes[0].vertices; 
   //----------------------------
   // Indicies setup (create triangles)
-  var susanIndicies = [].concat.apply([], susanModel.meshes[0].faces);
+  var susanIndicies = [].concat.apply([], model.meshes[0].faces);
   //-----------------------
   // Texture coordinates setup
-  var susanTexCoords = susanModel.meshes[0].texturecoords[0];
+  var susanTexCoords = model.meshes[0].texturecoords[0];
   //---------------------
   // Normals setup
-  var susanNormals = susanModel.meshes[0].normals;
+  var susanNormals = model.meshes[0].normals;
 
  
   // Buffers setup

@@ -1,29 +1,26 @@
 var axios = require('axios');
 
-// Load a text resource from a file over the network
-var loadTextResource = function(url, callback) {
-  var request = new XMLHttpRequest();
-  request.open('GET', url + '?please-dont-cache='+Math.random(), true);
-  request.onload = function () {
-    if (request.status < 200 || request > 299) {
-      callback('Error: HTTP Status ' + request.status + ' on resource ' + url);
-    }
-    else {
-      console.log(request.responseText);
-      callback(null, request.responseText);
-    }
-  };
 
-  request.send();
-}
+async function getTextResource(url) {
+  return axios.get(url)
+    .then(res => res.data)
+    .catch(error => error);
+};
 
-// const loadTextResource = (url) => {
-//   return axios.get(url);
-// }
+async function getImage(url) {
+  return axios.get(url).then(res => {
+    const image = new Image();
+    image.src = url;
+    return image;
+  })
+  .catch(error => error);
+};
 
-// const loadImage = (url) => {
-
-// }
+async function getJSONResource(url) {
+  return axios.get(url)
+    .then(res => res.data)
+    .catch(error => error);
+};
 
 var loadImage = function (url, callback) {
   var image = new Image();
@@ -33,23 +30,8 @@ var loadImage = function (url, callback) {
   image.src = url;
 }
 
-var loadJSONResource = function(url, callback) {
-  loadTextResource(url, function(err, result) {
-    if (err) {
-      callback(err);
-    }
-    else {
-      try {
-        callback(null, JSON.parse(result));
-      } catch (e) {
-        callback(e);
-      }
-    }
-  });
-}
-
 module.exports = {
-  loadTextResource,
-  loadImage,
-  loadJSONResource
+  getTextResource,
+  getImage,
+  getJSONResource,
 };
