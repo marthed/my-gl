@@ -2,16 +2,20 @@
   "name": "my-gl",
   "version": "1.0.0",
   "description": "Testing webGL",
-  "main": "index.js",
+  "main": "server/start.js",
   "scripts": {
-    "start": "nodemon start.js",
+    "start": "node server/start.js",
+    "client": "webpack --config webpack.dev.js --watch",
+    "server": "nodemon server/start.js",
+    "heroku-postbuild": "webpack -p --config webpack.prod.js --progress",
+    "build": "webpack -p --config webpack.prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/marthed/my-gl.git"
   },
-  "author": "",
+  "author": "Martin Hedlund",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/marthed/my-gl/issues"
@@ -21,6 +25,13 @@
     "nodemon": "^1.15.0"
   },
   "dependencies": {
-    "express": "^4.16.2"
+    "axios": "^0.17.1",
+    "clean-webpack-plugin": "^0.1.18",
+    "css-loader": "^0.28.9",
+    "express": "^4.16.2",
+    "style-loader": "^0.20.2",
+    "uglifyjs-webpack-plugin": "^1.2.0",
+    "webpack": "^3.11.0",
+    "webpack-merge": "^4.1.1"
   }
 }

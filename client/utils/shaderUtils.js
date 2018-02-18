@@ -25,3 +25,7 @@ var setUpShaders = function (
   };
   
 }
+
+module.exports = {
+  setUpShaders
+}
