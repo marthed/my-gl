@@ -21,16 +21,19 @@ async function getJSONResource(url) {
     .catch(error => error);
 };
 
-var loadImage = function (url, callback) {
-  var image = new Image();
-  image.onload = function () {
-    callback(null, image);
-  };
-  image.src = url;
+async function loadResources(vsUrl, fsUrl, modelURL, textureURL) {
+  try {
+    const vertexShaderText = await getTextResource(vsUrl);
+    const fragmentShaderText = await getTextResource(fsUrl);
+    const model = await getJSONResource(modelURL);
+    const texture = await getImage(textureURL);
+    return { vertexShaderText, fragmentShaderText, model, texture };
+  } catch (error) {
+    console.log('Error: ', error);
+    return Promise.reject(error);
+  }
 }
 
 module.exports = {
-  getTextResource,
-  getImage,
-  getJSONResource,
+  loadResources
 };

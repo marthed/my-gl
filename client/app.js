@@ -1,23 +1,12 @@
 import styles from './styles.css';
-import { getTextResource, getImage, getJSONResource } from './utils/loadingUtils';
+import { loadResources } from './utils/loadingUtils';
 import { setUpShaders } from './utils/shaderUtils';
 import { glMatrix, mat4 } from './utils/gl-matrix';
+import { setUpButton } from './utils/buttonFunctions';
 
-const initDemo = async () => {
-  try {
-    const vertexShaderText = await getTextResource('shaders/shader.vs.glsl');
-    const fragmentShaderText = await getTextResource('shaders/shader.fs.glsl');
-    const model = await getJSONResource('/models/Susan.json');
-    const texture = await getImage('textures/SusanTexture.png');
-    runDemo(vertexShaderText, fragmentShaderText, texture, model);
-  }
-  catch (error) {
-    console.log('Error: ', error);
-  }
-}
+var reqID;
 
 var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, model) {
-  console.log('This is working');
 
   var canvas = document.getElementById('glCanvas');
   var gl = canvas.getContext('webgl');
@@ -213,7 +202,6 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, model)
   gl.uniform3f(ambientUniformLocation, 0.2, 0.2, 0.2);
   gl.uniform3f(sunlightDirUniformLocation, 3.0, 4.0, -2.0);
   gl.uniform3f(sunlightIntensityUniformLocation, 0.9, 0.9, 0.9);
-  
 
   //------------------
   // Main render loop
@@ -234,9 +222,9 @@ var runDemo = function (vertexShaderText, fragmentShaderText, susanImage, model)
 
     requestAnimationFrame(loop); // Whenever screen is ready to draw a new image, call this function
   };
-  requestAnimationFrame(loop); // Whenever screen is ready to draw a new image, call this function
-  
- 
+  reqID = requestAnimationFrame(loop); // Whenever screen is ready to draw a new image, call this function 
 };
 
-initDemo();
+window.onload = () => {
+  setUpButton('b1', runDemo, reqID);
+};
