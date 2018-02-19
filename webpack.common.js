@@ -1,3 +1,4 @@
+require('babel-polyfill');
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
@@ -16,7 +17,7 @@ loaders.push({
 
 module.exports = {
   entry: {
-    app: './client/app.js'
+    app: ['babel-polyfill', './client/app.js']
   },
   plugins: [
     new CleanWebpackPlugin(['dist']),
