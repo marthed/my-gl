@@ -4,6 +4,12 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 let loaders = [];
 
 loaders.push({
+  test: /\.js?$/,
+  exclude: /node_modules/,
+  use: 'babel-loader',
+});
+
+loaders.push({
   test: /\.css$/,
   loaders: ['style-loader', 'css-loader']
 });

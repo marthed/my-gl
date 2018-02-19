@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
     "clean-webpack-plugin": "^0.1.18",
     "css-loader": "^0.28.9",
     "express": "^4.16.2",
