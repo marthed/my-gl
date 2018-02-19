@@ -1,6 +1,5 @@
 var axios = require('axios');
 
-
 async function getTextResource(url) {
   return axios.get(url)
     .then(res => res.data)
@@ -8,12 +7,12 @@ async function getTextResource(url) {
 };
 
 async function getImage(url) {
-  return axios.get(url).then(res => {
+  return new Promise((resolve, reject) => {
     const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(error);
     image.src = url;
-    return image;
-  })
-  .catch(error => error);
+  });
 };
 
 async function getJSONResource(url) {
