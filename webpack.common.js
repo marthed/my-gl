@@ -17,7 +17,7 @@ loaders.push({
 
 module.exports = {
   entry: {
-    app: ['babel-polyfill', './client/app.js']
+    app: ['babel-polyfill', './client/entry.js']
   },
   plugins: [
     new CleanWebpackPlugin(['dist']),

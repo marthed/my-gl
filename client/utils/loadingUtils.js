@@ -1,12 +1,12 @@
-var axios = require('axios');
+const axios = require('axios');
 
-async function getTextResource(url) {
+function getTextResource(url) {
   return axios.get(url)
     .then(res => res.data)
     .catch(error => error);
 };
 
-async function getImage(url) {
+function getImage(url) {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
@@ -15,7 +15,7 @@ async function getImage(url) {
   });
 };
 
-async function getJSONResource(url) {
+function getJSONResource(url) {
   return axios.get(url)
     .then(res => res.data)
     .catch(error => error);
@@ -35,5 +35,6 @@ async function loadResources(vsUrl, fsUrl, modelURL, textureURL) {
 }
 
 module.exports = {
-  loadResources
+  loadResources,
+  getTextResource
 };
