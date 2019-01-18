@@ -16,11 +16,11 @@ const drawLoop = function() {
   // 4. LINES: Draws a line between a pair of vertecies 
   // 5. TRIANGLE_STRIP
   // 6. TRINAGLE_FAN
-  // 7. TRIANGLE: Draw a triangle between 3 vertecies
+  // 7. TRIANGLES: Draw a triangle between 3 vertecies
 
   const start = 0;
   const count = 3;
-  gl.drawArrays(gl.LINE_LOOP, start, count);
+  gl.drawArrays(gl.TRIANGLES, start, count);
 
   requestAnimationFrame(drawLoop);
 };
@@ -61,7 +61,40 @@ function checkBrowserSupportForGL() {
   }
 }
 
-const positions = [0, 0, 0.3, 0, 0.3, 0.3, 0.7, 0.2, 1];
+function setupPositionBuffer(positions) {
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+}
+
+function connectBufferToProgram(program) {
+  const positionAttributeLocation = gl.getAttribLocation(
+    program,
+    "vertPosition"
+  );
+  // Tell webGL how to take data from the buffer and supply it to the
+  // attribute in the shader;
+  gl.enableVertexAttribArray(positionAttributeLocation);
+
+  const size = 3; // 3 components per iteration
+    const type = gl.FLOAT; // The data is 32bit floats
+    const normalize = false; // Don't normailze the data
+    const stride = 0; // 0 = move forward size * sizeOf(type) each iteration to get next position
+    const offset = 0; // start at the begining of the buffer
+
+  gl.vertexAttribPointer(
+    positionAttributeLocation,
+    size,
+    type,
+    normalize,
+    stride,
+    offset
+  );
+
+}
+
+const testPositions = [0, 0, 0.3, 0, 0.3, 0.3, 0.7, 0.2, 1];
 
 async function main() {
   try {
@@ -78,36 +111,8 @@ async function main() {
       fragmentShaderSource
     );
     const program = setupProgram(vertexShader, fragmentShader);
-
-    const positionAttributeLocation = gl.getAttribLocation(
-      program,
-      "vertPosition"
-    );
-
-    // Setup Buffer
-    const positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-    // Tell webGL how to take data from the buffer we setup above and supply it to the
-    // attribute in the shader;
-    gl.enableVertexAttribArray(positionAttributeLocation);
-
-    const size = 3; // 3 components per iteration
-    const type = gl.FLOAT; // The data is 32bit floats
-    const normalize = false; // Don't normailze the data (WHAT IS THIS)
-    const stride = 0; // 0 = move forward size * sizeOf(type) each iteration to get next position
-    const offset = 0; // start at the begining of the buffer
-
-    gl.vertexAttribPointer(
-      positionAttributeLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset
-    );
-
+    setupPositionBuffer(testPositions);
+    connectBufferToProgram(program);
     drawLoop();
   } catch (e) {
     console.log(e);
