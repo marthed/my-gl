@@ -1,7 +1,7 @@
 
 //precision mediump float;
 
-attribute vec3 vertPosition;
+attribute vec2 vertPosition;
 //attribute vec2 vertTexCoord;
 //attribute vec3 vertNormal;
 
@@ -15,5 +15,6 @@ void main()
 {
   //fragTexCoord = vertTexCoord;
   //fragNormal = (mWorld * vec4(vertNormal, 0.0)).xyz;
-  gl_Position = vec4(vertPosition, 1.0);
+  gl_Position = vec4(vertPosition, 1.0, 1.0);
+  gl_PointSize = 2.0;
 }

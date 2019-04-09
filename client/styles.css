@@ -1,43 +1,5 @@
 html, body {
   height: 100%;
-}
-
-.canvas-wrapper-outer {
-  height: 100%;
-  margin: 10px;
-  display: flex;
-  justify-content: center;
-}
-
-.canvas-wrapper-inner {
-  display: flex;
-  flex-flow: column;
-  justify-content: center;
-}
-
-.headline {
-  margin-bottom: 20px;
-  font-size: 24px;
-  text-align: center;
-}
-
-.buttons {
-  margin: 5px;
-  display: flex;
-  justify-content: center;
-}
-
-.buttons button {
-  background-color: rgb(243, 236, 234);
-  color: rgb(78, 76, 76);
-  border: none;
-  height: 30px;
-  margin: 5px;
-  text-align: center;
-  display: inline-block;
-  font-size: 16px;
-}
-
-.buttons button:hover {
-  background-color: rgb(224, 221, 220);
+  margin: 0;
+  padding: 0;
 }

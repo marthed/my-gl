@@ -23,5 +23,5 @@ void main()
   // vec3 lightIntensity = ambientLightIntensity +
   //   sun.color * max(dot(surfaceNormal, normSunDir), 0.0);
 
-  gl_FragColor = vec4(1, 0, 1, 1);
+  gl_FragColor = vec4(0, 0, 0, 0.1);
 }
