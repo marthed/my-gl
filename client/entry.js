@@ -1,5 +1,7 @@
 import "./styles.css";
 import { getTextResource } from "./utils/loadingUtils";
+import { mat4, glMatrix } from "./utils/gl-matrix";
+import pyramid from './pyramid';
 
 const canvas = document.getElementById("glCanvas");
 canvas.height = window.innerHeight;
@@ -7,15 +9,17 @@ canvas.width = window.innerWidth;
 
 const gl = canvas.getContext("webgl");
 
-const floor = [-0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5];
-const hej = [0.5, -0.5, -0.5, 1];
+const { pyramidSide1, pyramidSide2 } = pyramid;
 
-const testPositions = [...floor, ...hej];
+const vertecies = [...pyramidSide1.positions, ...pyramidSide2.positions];
+const vertexColors = [...pyramidSide1.colors, ...pyramidSide2.colors];
 
-console.log('testPositions: ', testPositions);
+
+console.log('vertecies: ', vertecies);
 const drawLoop = function() {
   gl.clearColor(0, 0, 0, 1.0);
   gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
 
   // Draw Arrays: GLenum, start, size
   // GLenums:
@@ -31,8 +35,7 @@ const drawLoop = function() {
   const count = 3;
   //gl.drawArrays(gl.TRIANGLES, start, count);
   //gl.drawArrays(gl.LINE_STRIP, 0, 2);
-  gl.drawArrays(gl.POINTS, 0, 4);
-  gl.drawArrays(gl.LINE_STRIP, 4, 2);
+  gl.drawArrays(gl.TRIANGLES, start, count);
 
   requestAnimationFrame(drawLoop);
 };
@@ -61,6 +64,7 @@ function createShader(type, source) {
   if (shaderHasCompiled) {
     return shader;
   }
+  console.log(`ERROR creating shader of type ${source}`);
   console.log(gl.getShaderInfoLog(shader));
   gl.deleteShader(shader);
   throw new Error("Failed creating a shader. Did not compile");
@@ -73,37 +77,72 @@ function checkBrowserSupportForGL() {
   }
 }
 
-function setupPositionBuffer(positions) {
+function setupPositionBuffer(program, positions, attribute) {
   const positionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
+  connectBufferToProgram(program, attribute);
 }
 
-function connectBufferToProgram(program) {
-  const positionAttributeLocation = gl.getAttribLocation(
+function setupColorBuffer(program, colors, attribute) {
+  const colorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  connectBufferToProgram(program, attribute);
+}
+
+function connectBufferToProgram(program, attribute) {
+  const attributeLocation = gl.getAttribLocation(
     program,
-    "vertPosition"
+    attribute
   );
   // Tell webGL how to take data from the buffer and supply it to the
   // attribute in the shader;
-  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.enableVertexAttribArray(attributeLocation);
 
-  const size = 2; // 3 components per iteration
+    const size = 3; // 3 components per iteration
     const type = gl.FLOAT; // The data is 32bit floats
     const normalize = false; // Don't normailze the data
     const stride = 0; // 0 = move forward size * sizeOf(type) each iteration to get next position
     const offset = 0; // start at the begining of the buffer
 
   gl.vertexAttribPointer(
-    positionAttributeLocation,
+    attributeLocation,
     size,
     type,
     normalize,
     stride,
     offset
   );
+}
 
+function setupModelMatrix(program) {
+  const uniformModelMatrixLocation = gl.getUniformLocation(program, 'u_modelMatrix');
+  const uniformModelMatrix = new Float32Array(16);
+  mat4.identity(uniformModelMatrix);
+  gl.uniformMatrix4fv(uniformModelMatrixLocation, gl.FALSE, uniformModelMatrix);
+}
+
+function setupViewMatrix(program) {
+  const uniformViewMatrixLocation = gl.getUniformLocation(program, 'u_viewMatrix');
+  const uniformViewMatrix = new Float32Array(16);
+  mat4.lookAt(uniformViewMatrix, [0, 0, 0.1], [0, 0, 0], [0, 1, 0]);
+  console.log('uniformViewMatrix: ', uniformViewMatrix);
+  gl.uniformMatrix4fv(uniformViewMatrixLocation, gl.FALSE, uniformViewMatrix);
+}
+
+function setupProjMatrix(program) {
+  const uniformProjMatrixLocation = gl.getUniformLocation(program, 'u_projMatrix');
+  const uniformProjMatrix = new Float32Array(16);
+  mat4.perspective(uniformProjMatrix, glMatrix.toRadian(45), (canvas.width / canvas.height), 1, 1000);
+  console.log('uniformProjMatrix: ', uniformProjMatrix);
+  gl.uniformMatrix4fv(uniformProjMatrix, gl.FALSE, uniformProjMatrixLocation);
+}
+
+function setupMatricies(program) {
+  setupModelMatrix(program);
+  setupViewMatrix(program);
+  setupProjMatrix(program);
 }
 
 async function main() {
@@ -121,8 +160,9 @@ async function main() {
       fragmentShaderSource
     );
     const program = setupProgram(vertexShader, fragmentShader);
-    setupPositionBuffer(testPositions);
-    connectBufferToProgram(program);
+    setupPositionBuffer(program, vertecies, 'a_vertPosition');
+    setupColorBuffer(program, vertexColors, 'a_color');
+    setupMatricies(program);
     drawLoop();
   } catch (e) {
     console.log(e);

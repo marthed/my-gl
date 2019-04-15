@@ -1,15 +1,9 @@
+precision mediump float;
 
-// precision mediump float;
-
-// struct DirectionalLight
-// {
-//   vec3 direction;
-//   vec3 color;
-// };
+varying vec4 v_color;
 
 // varying vec2 fragTexCoord;
 // varying vec3 fragNormal;
-
 // uniform vec3 ambientLightIntensity;
 // uniform DirectionalLight sun;
 // uniform sampler2D sampler;
@@ -23,5 +17,5 @@ void main()
   // vec3 lightIntensity = ambientLightIntensity +
   //   sun.color * max(dot(surfaceNormal, normSunDir), 0.0);
 
-  gl_FragColor = vec4(0, 0, 0, 0.1);
+  gl_FragColor = v_color;
 }
