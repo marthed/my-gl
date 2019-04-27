@@ -9,10 +9,12 @@ canvas.width = window.innerWidth;
 
 const gl = canvas.getContext("webgl");
 
-const { pyramidSide1, pyramidSide2 } = pyramid;
+const { pyramidSide1, pyramidSide2, pyramidSide3, pyramidSide4 } = pyramid;
 
-const vertecies = [...pyramidSide1.positions, ...pyramidSide2.positions];
-const vertexColors = [...pyramidSide1.colors, ...pyramidSide2.colors];
+const vertecies = [...pyramidSide1.positions, ...pyramidSide2.positions, 
+...pyramidSide3.positions, ...pyramidSide4.positions];
+const vertexColors = [...pyramidSide1.colors, ...pyramidSide2.colors,
+  ...pyramidSide3.colors, ...pyramidSide4.colors];
 
 
 console.log('vertecies: ', vertecies);
@@ -32,7 +34,7 @@ const drawLoop = function() {
   // 7. TRIANGLES: Draw a triangle between 3 vertecies
 
   const start = 0;
-  const count = 3;
+  const count = 3 * 4;
   //gl.drawArrays(gl.TRIANGLES, start, count);
   //gl.drawArrays(gl.LINE_STRIP, 0, 2);
   gl.drawArrays(gl.TRIANGLES, start, count);
@@ -126,7 +128,7 @@ function setupModelMatrix(program) {
 function setupViewMatrix(program) {
   const uniformViewMatrixLocation = gl.getUniformLocation(program, 'u_viewMatrix');
   const uniformViewMatrix = new Float32Array(16);
-  mat4.lookAt(uniformViewMatrix, [0, 0, 0.1], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(uniformViewMatrix, [0, 5, 10], [0, 0, 0], [0, 1, 0]);
   console.log('uniformViewMatrix: ', uniformViewMatrix);
   gl.uniformMatrix4fv(uniformViewMatrixLocation, gl.FALSE, uniformViewMatrix);
 }
@@ -134,15 +136,53 @@ function setupViewMatrix(program) {
 function setupProjMatrix(program) {
   const uniformProjMatrixLocation = gl.getUniformLocation(program, 'u_projMatrix');
   const uniformProjMatrix = new Float32Array(16);
-  mat4.perspective(uniformProjMatrix, glMatrix.toRadian(45), (canvas.width / canvas.height), 1, 1000);
+  mat4.perspective(uniformProjMatrix, glMatrix.toRadian(100), (canvas.width / canvas.height), 1, 1000);
   console.log('uniformProjMatrix: ', uniformProjMatrix);
-  gl.uniformMatrix4fv(uniformProjMatrix, gl.FALSE, uniformProjMatrixLocation);
+  gl.uniformMatrix4fv(uniformProjMatrixLocation, gl.FALSE, uniformProjMatrix);
 }
 
 function setupMatricies(program) {
   setupModelMatrix(program);
   setupViewMatrix(program);
   setupProjMatrix(program);
+}
+
+function degreeToRadian(degree) {
+  return degree * (Math.PI/180)
+}
+
+let angle = 0;
+function rotateRight(program) {
+  const uniformModelMatrixLocation = gl.getUniformLocation(program, 'u_modelMatrix');
+  const uniformModelMatrix = mat4.identity(new Float32Array(16));
+  angle += 1;
+  const radian = degreeToRadian(angle);
+  mat4.rotate(uniformModelMatrix, uniformModelMatrix, radian, [0, 1, 0]);
+  gl.uniformMatrix4fv(uniformModelMatrixLocation, gl.FALSE, uniformModelMatrix);
+}
+function rotateLeft(program) {
+  const uniformModelMatrixLocation = gl.getUniformLocation(program, 'u_modelMatrix');
+  const uniformModelMatrix = mat4.identity(new Float32Array(16));
+  angle -= 1;
+  const radian = degreeToRadian(angle);
+  mat4.rotate(uniformModelMatrix, uniformModelMatrix, radian, [0, 1, 0]);
+  gl.uniformMatrix4fv(uniformModelMatrixLocation, gl.FALSE, uniformModelMatrix);
+
+}
+
+function addEventListener(program) {
+  document.addEventListener('keydown', evt => {
+    const key = evt.key;
+    switch (key) {
+      case 'ArrowRight':
+        console.log('HEJ!');
+        return rotateRight(program);
+      case 'ArrowLeft':
+        return rotateLeft(program);
+      default:
+        break;
+    }
+  });
 }
 
 async function main() {
@@ -163,6 +203,7 @@ async function main() {
     setupPositionBuffer(program, vertecies, 'a_vertPosition');
     setupColorBuffer(program, vertexColors, 'a_color');
     setupMatricies(program);
+    addEventListener(program);
     drawLoop();
   } catch (e) {
     console.log(e);
