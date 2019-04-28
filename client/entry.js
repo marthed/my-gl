@@ -17,7 +17,6 @@ const vertexColors = [...pyramidSide1.colors, ...pyramidSide2.colors,
   ...pyramidSide3.colors, ...pyramidSide4.colors];
 
 
-console.log('vertecies: ', vertecies);
 const drawLoop = function() {
   gl.clearColor(0, 0, 0, 1.0);
   gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -128,8 +127,7 @@ function setupModelMatrix(program) {
 function setupViewMatrix(program) {
   const uniformViewMatrixLocation = gl.getUniformLocation(program, 'u_viewMatrix');
   const uniformViewMatrix = new Float32Array(16);
-  mat4.lookAt(uniformViewMatrix, [0, 5, 10], [0, 0, 0], [0, 1, 0]);
-  console.log('uniformViewMatrix: ', uniformViewMatrix);
+  mat4.lookAt(uniformViewMatrix, [0, 5, 10], [0, 5, 0], [0, 1, 0]);
   gl.uniformMatrix4fv(uniformViewMatrixLocation, gl.FALSE, uniformViewMatrix);
 }
 
@@ -137,7 +135,6 @@ function setupProjMatrix(program) {
   const uniformProjMatrixLocation = gl.getUniformLocation(program, 'u_projMatrix');
   const uniformProjMatrix = new Float32Array(16);
   mat4.perspective(uniformProjMatrix, glMatrix.toRadian(100), (canvas.width / canvas.height), 1, 1000);
-  console.log('uniformProjMatrix: ', uniformProjMatrix);
   gl.uniformMatrix4fv(uniformProjMatrixLocation, gl.FALSE, uniformProjMatrix);
 }
 
@@ -175,7 +172,6 @@ function addEventListener(program) {
     const key = evt.key;
     switch (key) {
       case 'ArrowRight':
-        console.log('HEJ!');
         return rotateRight(program);
       case 'ArrowLeft':
         return rotateLeft(program);
