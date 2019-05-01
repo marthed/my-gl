@@ -2,12 +2,10 @@ import "./styles.css";
 import { getTextResource } from "./utils/loadingUtils";
 import { mat4, glMatrix } from "./utils/gl-matrix";
 import pyramid from './pyramid';
+import { getCurrentState, setState } from './state';
+import playerController from './player/playerController';
 
-const canvas = document.getElementById("glCanvas");
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
-
-const gl = canvas.getContext("webgl");
+const { canvas, gl } = getCurrentState();
 
 const { pyramidSide1, pyramidSide2, pyramidSide3, pyramidSide4 } = pyramid;
 
@@ -121,13 +119,14 @@ function setupModelMatrix(program) {
   const uniformModelMatrixLocation = gl.getUniformLocation(program, 'u_modelMatrix');
   const uniformModelMatrix = new Float32Array(16);
   mat4.identity(uniformModelMatrix);
+  mat4.translate(uniformModelMatrix, uniformModelMatrix, [0, -5, 10])
   gl.uniformMatrix4fv(uniformModelMatrixLocation, gl.FALSE, uniformModelMatrix);
 }
 
 function setupViewMatrix(program) {
   const uniformViewMatrixLocation = gl.getUniformLocation(program, 'u_viewMatrix');
   const uniformViewMatrix = new Float32Array(16);
-  mat4.lookAt(uniformViewMatrix, [0, 5, 10], [0, 5, 0], [0, 1, 0]);
+  mat4.lookAt(uniformViewMatrix, [0, 0, 0,], [0, 0, 1], [0, 1, 0]);
   gl.uniformMatrix4fv(uniformViewMatrixLocation, gl.FALSE, uniformViewMatrix);
 }
 
@@ -142,43 +141,6 @@ function setupMatricies(program) {
   setupModelMatrix(program);
   setupViewMatrix(program);
   setupProjMatrix(program);
-}
-
-function degreeToRadian(degree) {
-  return degree * (Math.PI/180)
-}
-
-let angle = 0;
-function rotateRight(program) {
-  const uniformModelMatrixLocation = gl.getUniformLocation(program, 'u_modelMatrix');
-  const uniformModelMatrix = mat4.identity(new Float32Array(16));
-  angle += 1;
-  const radian = degreeToRadian(angle);
-  mat4.rotate(uniformModelMatrix, uniformModelMatrix, radian, [0, 1, 0]);
-  gl.uniformMatrix4fv(uniformModelMatrixLocation, gl.FALSE, uniformModelMatrix);
-}
-function rotateLeft(program) {
-  const uniformModelMatrixLocation = gl.getUniformLocation(program, 'u_modelMatrix');
-  const uniformModelMatrix = mat4.identity(new Float32Array(16));
-  angle -= 1;
-  const radian = degreeToRadian(angle);
-  mat4.rotate(uniformModelMatrix, uniformModelMatrix, radian, [0, 1, 0]);
-  gl.uniformMatrix4fv(uniformModelMatrixLocation, gl.FALSE, uniformModelMatrix);
-
-}
-
-function addEventListener(program) {
-  document.addEventListener('keydown', evt => {
-    const key = evt.key;
-    switch (key) {
-      case 'ArrowRight':
-        return rotateRight(program);
-      case 'ArrowLeft':
-        return rotateLeft(program);
-      default:
-        break;
-    }
-  });
 }
 
 async function main() {
@@ -196,10 +158,10 @@ async function main() {
       fragmentShaderSource
     );
     const program = setupProgram(vertexShader, fragmentShader);
+    setState({ program });
     setupPositionBuffer(program, vertecies, 'a_vertPosition');
     setupColorBuffer(program, vertexColors, 'a_color');
     setupMatricies(program);
-    addEventListener(program);
     drawLoop();
   } catch (e) {
     console.log(e);
